@@ -1,0 +1,15 @@
+http:
+  host: "0.0.0.0"
+  port: "8081"
+
+connector:
+  complaint: 
+    host: "grp1-complaint.us-e2.cloudhub.io"
+    port: "80"
+    protocol: "HTTP"
+    basepath: "/"
+  customer:
+    host: "grp1-customer.us-e2.cloudhub.io"
+    port: "80"
+    protocol: "HTTP"
+    basepath: "/"

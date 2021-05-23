@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:db="http://www.mulesoft.org/schema/mule/db"
+	xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="
+http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd 
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd">
+	
+	<http:listener-config name="complaintsapi-httpListenerConfig">
+        <http:listener-connection host="${http.host}" port="${http.port}" />
+    </http:listener-config>
+	<configuration-properties doc:name="Configuration properties" doc:id="96e713a6-097d-47d8-984d-2906b62e05c8" file="Cust_Complaints-DEV.yaml" />
+	<configuration doc:name="Configuration" doc:id="112f6f18-5247-4111-8918-55f46be3708d" defaultErrorHandler-ref="globalError_Handler" />
+	<error-handler name="globalError_Handler" doc:id="86370d8c-af8f-4d48-9fb6-dad8256b1cef" >
+		<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="c031480d-ebe8-482c-b1ee-bfd930d67c5b" type="DB:CONNECTIVITY">
+			<set-payload value='#["Error in Database Connectivity. Details: " ++ error.description]' doc:name="Error Payload" doc:id="28a367d9-6572-4e40-aa9d-0b513a2f7e61" />
+		</on-error-propagate>
+		<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="a49bc875-6867-455f-b0ef-0a6eb8ed5b17" type="DB:QUERY_EXECUTION">
+			<set-payload value='#["Error in SQL Query Execution. Details: " ++ error.description]' doc:name="Error Payload" doc:id="68283272-35cd-4ae4-9557-08569c1e7087" />
+		</on-error-propagate>
+		<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="4ac9f94c-dabc-41d1-a2ff-25b51e038bc4" type="COMPLAINTS-SYSTEM-API:BAD_REQUEST, COMPLAINTS-SYSTEM-API:INTERNAL_SERVER_ERROR, COMPLAINTS-SYSTEM-API:METHOD_NOT_ALLOWED, COMPLAINTS-SYSTEM-API:NOT_FOUND, COMPLAINTS-SYSTEM-API:SERVICE_UNAVAILABLE">
+			<set-payload value='#["Complaints System API Error. Details: " ++ error.description]' doc:name="Error Payload" doc:id="ce6252bf-9c10-4212-bcbc-5059bb1050f5" />
+		</on-error-propagate>
+		<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="e3eb3aa8-6a6e-4945-a0ed-ba13687a2bc1" type="CUSTOMER-SYSTEM-API:BAD_REQUEST, CUSTOMER-SYSTEM-API:CONNECTIVITY, CUSTOMER-SYSTEM-API:INTERNAL_SERVER_ERROR, CUSTOMER-SYSTEM-API:SERVICE_UNAVAILABLE">
+			<set-payload value='#["Customer System API Error. Details: " ++ error.description]' doc:name="Error Payload" doc:id="ebbfe569-124c-490a-bf3d-0c71510a2bf0" />
+		</on-error-propagate>
+		<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="043bed43-efc6-4bd4-9ba1-d285b2b4ac4c" type="HTTP:BAD_GATEWAY, HTTP:CONNECTIVITY, HTTP:INTERNAL_SERVER_ERROR, HTTP:METHOD_NOT_ALLOWED, HTTP:NOT_FOUND, HTTP:RETRY_EXHAUSTED, HTTP:SERVICE_UNAVAILABLE">
+			<set-payload value='#["HTTP Requester Error. Details: " ++ error.description]' doc:name="Error Payload" doc:id="9a3fb5d4-ddfd-46ca-a780-cab298a5c45b" />
+		</on-error-propagate>
+		<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="173b9718-d6ba-42c8-a04c-ac2d432b8556" type="ANY">
+			<set-payload value='#["Error Occurred. Details: " ++ error.description]' doc:name="Error Payload" doc:id="d5209a02-d4fa-4031-a8b1-fa519700e62c" />
+		</on-error-propagate>
+	</error-handler>
+	
+	
+	
+</mule>

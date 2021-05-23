@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:munit="http://www.mulesoft.org/schema/mule/munit" xmlns:munit-tools="http://www.mulesoft.org/schema/mule/munit-tools"
+	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xsi:schemaLocation="
+		http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+		http://www.mulesoft.org/schema/mule/munit http://www.mulesoft.org/schema/mule/munit/current/mule-munit.xsd
+		http://www.mulesoft.org/schema/mule/munit-tools  http://www.mulesoft.org/schema/mule/munit-tools/current/mule-munit-tools.xsd">
+	<munit:config name="implementation-test-suite.xml" />
+	<munit:test name="implementation-test-suite-GETComplaintsbyCIDFlowTest" doc:id="a6fcfa59-2164-4725-81ff-54fc96011c79" description="Test">
+		<munit:execution >
+			<munit:set-null-payload doc:name="Set null payload" doc:id="04c3ad2f-b07e-44bf-be9e-81d185f1d95c" />
+			<munit:set-event doc:name="Set Event" doc:id="01971847-be74-4a16-824a-5144d27642e6" >
+				<munit:variables >
+					<munit:variable key="complaintID" value="100001" mediaType="application/json" />
+				</munit:variables>
+			</munit:set-event>
+			<flow-ref doc:name="Flow-ref to GETComplaintsbyCIDFlow" doc:id="b252a36a-67b9-4386-9972-baeaaa79d856" name="GETComplaintsbyCIDFlow"/>
+		</munit:execution>
+		<munit:validation >
+			<munit-tools:assert-that doc:name="Assert that" doc:id="978ea00b-d3c3-4b74-96af-3239b046fed9" message='"Retrieved Null Payload"' expression="#[payload]" is="#[MunitTools::notNullValue()]"/>
+		</munit:validation>
+	</munit:test>
+	<munit:test name="implementation-test-suite-DELETEComplaintsbyCIDFlowTest" doc:id="7cd8f8e0-7d0a-410e-8c81-e03419fa32b4" description="Test">
+		<munit:behavior >
+			<munit-tools:mock-when doc:name="Mock when" doc:id="365208ce-a8ec-43d2-8657-4d0479b68680" processor="complaints-system-api:delete-complaint-by-complaint-id">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="40e267ee-22e1-4750-84b9-f984d686c014" attributeName="doc:id" />
+				</munit-tools:with-attributes>
+			</munit-tools:mock-when>
+		</munit:behavior>
+		<munit:execution >
+			<munit:set-null-payload doc:name="Set null payload" doc:id="ecaea52b-24ee-4864-8da3-dbaba9a25083" />
+			<munit:set-event doc:name="Set Event" doc:id="7f65cbbc-a365-4027-a4b0-8f351872a83e" >
+				<munit:variables >
+					<munit:variable key="complaintID" value="100001" mediaType="application/json" />
+				</munit:variables>
+			</munit:set-event>
+			<flow-ref doc:name="Flow-ref to DELETEComplaintsbyCIDFlow" doc:id="d8900754-3f8f-4101-88b8-a3104adf23b5" name="DELETEComplaintsbyCIDFlow"/>
+		</munit:execution>
+		<munit:validation >
+			<munit-tools:assert-equals doc:name="Assert equals" doc:id="265662c6-ce6e-42cc-abcd-b71a639a4818" actual="#[payload]" expected='#[{&#10;	"Message": "The Complaint has been deleted for ComplaintID: 100001"&#10;}]'/>
+		</munit:validation>
+	</munit:test>
+	<munit:test name="implementation-test-suite-PATCHComplaintbyCIDFlowTest" doc:id="a22dd263-7cf5-4fc5-a3c8-453f64515099" description="Test">
+		<munit:behavior >
+			<munit-tools:mock-when doc:name="Mock when" doc:id="4dec2b8e-8b84-4089-9723-8055b566234d" processor="complaints-system-api:patch-complaint-by-complaint-id">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="0df348ff-d159-4170-a16b-9ccd15546ced" attributeName="doc:id" />
+				</munit-tools:with-attributes>
+			</munit-tools:mock-when>
+		</munit:behavior>
+		<munit:execution >
+			<munit:set-null-payload doc:name="Set null payload" doc:id="afe755a6-0e63-4182-b268-217fce812668" />
+			<munit:set-event doc:name="Set Event" doc:id="6e91ac54-a481-411f-8b5a-13cd2ef00caa" >
+				<munit:variables >
+					<munit:variable key="complaintID" value="100001" mediaType="application/json" />
+				</munit:variables>
+			</munit:set-event>
+			<flow-ref doc:name="Flow-ref to PATCHComplaintbyCIDFlow" doc:id="2a7fc220-36b4-4572-b2c7-6e1e764d3840" name="PATCHComplaintbyCIDFlow"/>
+		</munit:execution>
+		<munit:validation >
+			<munit-tools:assert-equals doc:name="Assert equals" doc:id="c8fc6c65-92fd-4d34-97f0-7816d3c4ca43" actual="#[payload]" expected='#[{&#10;	"Message": "The Complaint has been updated for ComplaintID: 100001"&#10;}]'/>
+		</munit:validation>
+	</munit:test>
+
+
+</mule>

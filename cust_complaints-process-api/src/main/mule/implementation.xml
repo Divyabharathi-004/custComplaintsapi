@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:customer-system-api="http://www.mulesoft.org/schema/mule/customer-system-api" xmlns:complaints-system-api="http://www.mulesoft.org/schema/mule/complaints-system-api"
+	xmlns:complaints-api="http://www.mulesoft.org/schema/mule/complaints-api"
+	xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns:tracking="http://www.mulesoft.org/schema/mule/ee/tracking" xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:db="http://www.mulesoft.org/schema/mule/db" xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd
+http://www.mulesoft.org/schema/mule/ee/tracking http://www.mulesoft.org/schema/mule/ee/tracking/current/mule-tracking-ee.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/complaints-api http://www.mulesoft.org/schema/mule/complaints-api/current/mule-complaints-api.xsd
+http://www.mulesoft.org/schema/mule/complaints-system-api http://www.mulesoft.org/schema/mule/complaints-system-api/current/mule-complaints-system-api.xsd
+http://www.mulesoft.org/schema/mule/customer-system-api http://www.mulesoft.org/schema/mule/customer-system-api/current/mule-customer-system-api.xsd">
+	
+	<complaints-system-api:config name="Complaints_system_api_Config" doc:name="Complaints-system-api Config" doc:id="fbb25da2-3bbc-45a3-9d9f-abdbd6e32556" property_host="${connector.complaint.host}" property_port="${connector.complaint.port}" property_protocol="${connector.complaint.protocol}" property_basePath="${connector.complaint.basepath}" />
+	<customer-system-api:config name="Customer_System_API_Config" doc:name="Customer-System-API Config" doc:id="fa9c1c08-ae08-4cc5-9adb-9fccabf48c49" property_host="${connector.customer.host}" property_port="${connector.customer.port}" property_protocol="${connector.customer.protocol}" property_basePath="${connector.customer.basepath}" />
+	<flow name="GETComplaintsbyCIDFlow" doc:id="f3fe24b7-4460-4d02-93f2-67f3cd2ded8b" >
+		<complaints-system-api:get-complaint-by-complaint-id doc:name="GET Complaint by Complaint-ID." doc:id="dc2df0e5-2201-4c4e-84e4-65028a48bb75" config-ref="Complaints_system_api_Config" complaint-id="#[vars.complaintID]"/>
+		<ee:transform doc:name="Transform Message" doc:id="26ab4319-911f-429a-a55f-ab471847d7c6" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	ComplaintID: payload.complaintID,
+	ComplaintStatus: payload.complaintStatus,
+	ComplaintDescription: payload.complaintDescription,
+	ComplaintDate: payload.complaintDate,
+	ComplaintResponse: payload.complaintResponse,
+	CustomerNumber: "C" ++ payload.customerNumber,
+	OrderID: "O" ++ payload.orderID,
+	OrderDate: payload.orderDate,
+	ProductID: payload.productID
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	
+</flow>
+	<flow name="DELETEComplaintsbyCIDFlow" doc:id="06522b9a-cb1e-4323-a192-8b39d3a2e095" >
+		<complaints-system-api:delete-complaint-by-complaint-id doc:name="DELETE Complaint by Complaint-ID." doc:id="40e267ee-22e1-4750-84b9-f984d686c014" config-ref="Complaints_system_api_Config" complaint-id="#[vars.complaintID]"/>
+		<ee:transform doc:name="Transform Message" doc:id="f94f3a12-2013-44f6-968c-b41573bfa6a0" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	"Message": "The Complaint has been deleted for ComplaintID: " ++ vars.complaintID as Number
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</flow>
+	<flow name="PATCHComplaintbyCIDFlow" doc:id="915373a0-405f-40c0-97d1-b465d1c8498a" >
+		<complaints-system-api:patch-complaint-by-complaint-id doc:name="PATCH Complaint by Complaint-ID." doc:id="0df348ff-d159-4170-a16b-9ccd15546ced" config-ref="Complaints_system_api_Config" complaint-id="#[vars.complaintID]"/>
+		<ee:transform doc:name="Transform Message" doc:id="07fa2696-e33d-4c37-8ed8-a956634787a4">
+			<ee:message>
+				<ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{
+	"Message": "The Complaint has been updated for ComplaintID: " ++ vars.complaintID as Number
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</flow>
+	<flow name="POSTComplaintFlow" doc:id="5bfe4f1b-0221-49f5-a8cf-1f8e082fe252" >
+		<complaints-system-api:post-a-complaint doc:name="POST a Complaint." doc:id="f0895caf-35d5-4f85-a268-099d635abe29" config-ref="Complaints_system_api_Config"/>
+		<ee:transform doc:name="Transform Message" doc:id="646ed1f1-dbee-4d36-b5e6-45aab625788b" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	"Message": "The Complaint has been added."
+}]]></ee:set-payload>
+			</ee:message>
+			<ee:variables >
+				<ee:set-variable variableName="customerNumber" ><![CDATA[%dw 2.0
+output application/json
+---
+payload.customerNumber]]></ee:set-variable>
+			</ee:variables>
+		
+</ee:transform>
+		<set-variable value="201" doc:name="HTTP Status" doc:id="b92b19fd-6c08-4541-8925-c34dd9aa946a" variableName="httpStatus"/>
+		<scatter-gather doc:name="Scatter-Gather" doc:id="28eb2e0a-1655-47b7-a9f7-19612304a303" >
+			<route >
+				<customer-system-api:get-all-customers-data doc:name="Get All Customers Data" doc:id="1133b9ab-36f8-4f64-92f8-64daa5325793" config-ref="Customer_System_API_Config"/>
+			</route>
+			<route >
+				<complaints-system-api:get-all-complaints doc:name="GET all Complaints." doc:id="f93adf95-886f-4eaf-bd44-401a220103ab" config-ref="Complaints_system_api_Config"/>
+				<ee:transform doc:name="Transform Message" doc:id="84f1d00a-4b71-4dc6-bcb0-582c8f1b57e8">
+					<ee:message>
+						<ee:set-payload><![CDATA[%dw 2.0
+output application/json
+var maxID =  payload map {
+	complaintID: $.complaintID
+}
+---
+ComplaintID: max(maxID.complaintID)]]></ee:set-payload>
+					</ee:message>
+				</ee:transform>
+			</route>
+		</scatter-gather>
+		<ee:transform doc:name="Transform Message" doc:id="016b7c2d-9da9-4292-a63a-24368d3ff8d3">
+			<ee:message>
+				<ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{
+	"message": "Complaint posted Successfully. ComplaintID: " ++ payload."1".payload.ComplaintID as Number
+}]]></ee:set-payload>
+			</ee:message>
+			<ee:variables >
+				<ee:set-variable variableName="payload" ><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-variable>
+			</ee:variables>
+		</ee:transform>
+		<http:request method="POST" doc:name="Request (notifications)" doc:id="598e5fe5-803a-4c72-8bc9-742d5d6a2d4c" url="http://proj-notifications-process-api.us-e2.cloudhub.io/api/notifications">
+			<http:body ><![CDATA[#[{
+	"type": "SMS",
+	"subject": "Complaint Notification",
+	"message": "Dear Customer. " ++ " Your Complaint is registered with us with ComplaintID: " ++ vars.payload."1".payload.ComplaintID ++ ". Thankyou for reaching out to us.",
+	"recipient": vars.payload."0".payload.phone
+}]]]></http:body>
+		</http:request>
+	
+</flow>
+</mule>
